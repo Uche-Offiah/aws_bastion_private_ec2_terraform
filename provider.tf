@@ -3,8 +3,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "aws-bastion-private-ec2"
-      Environment = "development"
+      Project     = var.Project_name
+      Environment = var.environment
       ManagedBy   = "Terraform"
     }
   }
