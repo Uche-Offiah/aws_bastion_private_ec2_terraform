@@ -4,7 +4,7 @@ variable "aws_region" {
   default     = "us-east-2"
 }
 
-variable "Project_name" {
+variable "project_name" {
   description = "Name used to identify project resources."
   type        = string
   default     = "aws-bastion-private-ec2"
