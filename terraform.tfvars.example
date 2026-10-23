@@ -1,0 +1,2 @@
+# Documentation-only example from the expected admin IP range.
+admin_cidr = 198.51.100.25/32

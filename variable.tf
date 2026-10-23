@@ -33,3 +33,16 @@ variable "private_subnet_cidr" {
   type        = string
   default     = "10.20.2.0/24"
 }
+
+variable "admin_cidr" {
+  description = "Approved public IPv4 CIDR allowed to connect bastion over SSH"
+  type        = string
+
+  validation {
+    condition = (
+      can(cidrhost(var.admin_cidr, 0)) &&                      # parse and get the first host IP
+      can(regex("/([0-9]|[12][0-9]|3[0-2])$", var.admin_cidr)) # check to ensure a valid CIDR /0-32. [12][0-9] matches /10 to /29. $ ensure pattern occur at the end of the string
+    )
+    error_message = "admin_cidr must be valid IPv4 CIDR, such as 198.51.100.25/32."
+  }
+}
