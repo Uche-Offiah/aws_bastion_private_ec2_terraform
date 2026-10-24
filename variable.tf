@@ -58,3 +58,13 @@ variable "private_instance_type" {
   type        = string
   default     = "t3.micro"
 }
+
+variable "key_pair_name" {
+  description = "Name of the existing EC2 key pair used for SSH authentication."
+  type        = string
+
+  validation {
+    condition     = length(trimspace(var.key_pair_name)) > 0
+    error_message = "key_pair_name must not be empty."
+  }
+}
