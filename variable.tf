@@ -46,3 +46,15 @@ variable "admin_cidr" {
     error_message = "admin_cidr must be valid IPv4 CIDR, such as 198.51.100.25/32."
   }
 }
+
+variable "bastion_instance_type" {
+  description = "EC2 instance type for the bastion host"
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "private_instance_type" {
+  description = "EC2 instance type for the private EC2 instance."
+  type        = string
+  default     = "t3.micro"
+}
