@@ -1,92 +1,151 @@
-# AWS Bastion and Private EC2 Infrastructure
+# AWS Bastion and Private EC2 with Terraform
 
-## Overview
+A hands-on AWS networking and infrastructure-as-code proof of concept (POC) that demonstrates network segmentation, controlled SSH access, and private EC2 isolation using Terraform.
 
-This project uses Terraform to provision a dedicated AWS network containing a public bastion host and a private EC2 instance.
+## Project Goals
 
-The architecture is designed to demonstrate secure network segmentation, controlled administrative access, and infrastructure provisioning using Infrastructure as Code (IaC).
+- Build a dedicated VPC with public and private subnets.
+- Restrict administrative SSH access through a bastion host.
+- Keep the private EC2 instance without a public IP address.
+- Apply least-privilege network access and defense-in-depth principles.
+- Establish a foundation for exploring network security, scalability, and operational practices.
 
 ## Architecture
 
-The initial architecture includes:
+The project uses a dedicated VPC with a public subnet for the bastion and a private subnet for the private EC2 instance.
 
-- A dedicated VPC using `10.20.0.0/16`.
-- A public subnet for the bastion host.
-- A private subnet for the private EC2 instance.
-- An Internet Gateway and public route table for internet connectivity to the public subnet.
-- A private route table without a default internet route.
-- Security groups that restrict SSH access to the approved administrator CIDR and the bastion host.
-- Amazon Linux 2023 EC2 instances.
-- Encrypted root EBS volumes and IMDSv2 enforcement.
-- Terraform-managed resource tags.
+| Component | CIDR / Configuration | Purpose |
+|---|---|---|
+| VPC | `10.20.0.0/16` | Dedicated project network |
+| Public subnet | `10.20.1.0/24` | Bastion host |
+| Private subnet | `10.20.2.0/24` | Private EC2 workload |
+| Internet Gateway | Attached to the VPC | Internet connectivity path for the public subnet |
+| Bastion ingress | TCP 22 from `admin_cidr` | Restricted administrator access |
+| Private ingress | TCP 22 from bastion security group | Controlled SSH to private infrastructure |
 
-## Technology Stack
+The private subnet has no internet default route. No NAT Gateway or VPC endpoints are currently configured.
 
-- AWS
-- Terraform
-- AWS CLI
-- Git and GitHub
+The intended administrative path is:
+
+```text
+Administrator workstation
+        |
+        | SSH (TCP 22)
+        v
+Public bastion EC2
+        |
+        | SSH (TCP 22)
+        v
+Private EC2
+```
+
+See [Architecture Overview](doc/ARCHITECTURE.md) for the detailed design and traffic flows.
+
+## Security Controls
+
+The current Terraform configuration includes:
+
+- SSH ingress restricted to the configured administrator CIDR on the bastion.
+- SSH ingress to the private instance restricted to the bastion security group.
+- No public IP address on the private instance.
+- IMDSv2 required for both EC2 instances.
+- Encrypted `gp3` root EBS volumes.
+- EC2 API termination protection enabled.
+- No explicitly configured security-group egress rules other than the required bastion-to-private SSH rule.
+
+**Important:** The example administrator CIDR is documentation-only. Replace it with an approved public IPv4 CIDR before any deployment. Confirm that the EC2 key pair exists in the selected AWS region and that the authorized administrator has access to its private key.
+
+See [Security Design](doc/SECURITY.md) for security assumptions, limitations, and deferred decisions.
 
 ## Prerequisites
 
-Before deploying the infrastructure, ensure you have:
+Install and configure:
 
-- Terraform installed.
-- AWS CLI installed and configured with the intended AWS account and region.
-- Appropriate AWS permissions.
-- An existing EC2 key pair in the selected region.
-- An approved public IPv4 CIDR for administrator SSH access.
+- [Terraform](https://developer.hashicorp.com/terraform/install)
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- An AWS identity authorized to inspect and manage the intended resources.
+- An existing EC2 key pair in the selected AWS region.
+- An approved administrator public IPv4 CIDR.
+
+The Terraform configuration uses the AWS provider `~> 6.0` and requires Terraform `>= 1.10.0, < 2.0.0`.
 
 ## Configuration
 
-Set the required variables in a local `terraform.tfvars` file, including:
+Review `variable.tf` and `terraform.tfvars.example` to understand the configurable inputs.
 
-- `admin_cidr`
-- `key_pair_name`
+Create a local `terraform.tfvars` file based on the example:
 
-Review the variable definitions in `variables.tf` for defaults and other configurable settings.
+```hcl
+aws_region     = "us-east-2"
+admin_cidr     = "REPLACE_WITH_APPROVED_PUBLIC_IPV4_CIDR"
+key_pair_name  = "REPLACE_WITH_EXISTING_EC2_KEY_PAIR_NAME"
+```
 
-Do not commit real `terraform.tfvars` files, private keys, credentials, or other secrets.
+The example above illustrates the main deployment-specific values; retain or add any other required variables from `terraform.tfvars.example`.
 
-## Validation
+Do not commit `terraform.tfvars`, private keys, Terraform state files, or saved plan files.
 
-Initialize the Terraform working directory:
+## Validate and Plan
+
+Run these commands from the repository root:
 
 ```bash
 terraform init
-```
-
-Format and validate the configuration:
-
-```bash
 terraform fmt -check -recursive
 terraform validate
+terraform plan -out=tfplan
+terraform show -no-color tfplan
 ```
 
-Review the proposed infrastructure changes:
+Review the plan carefully for unexpected resource changes, particularly in a shared AWS account.
+
+Check the AWS identity and intended region before planning:
 
 ```bash
-terraform plan
+aws sts get-caller-identity
+aws configure get region
 ```
 
-**Do not apply the plan until the proposed changes have been reviewed and explicitly approved.**
+The AWS CLI region may differ from the Terraform provider region, so confirm both.
+
+**Do not apply a plan without explicit approval.** This repository's current workflow does not require deployment to complete the POC's documentation and review milestones.
+
+If deployment is approved, follow the [Terraform Deployment Runbook](doc/runbooks/terraform-deployment.md).
 
 ## Project Status
 
-The project is being developed iteratively. Each iteration introduces a cohesive set of changes, validated and documented before being merged into the integration branch and tagged.
+This project is being developed iteratively. The initial network foundation is documented, and the current hardening iteration includes security controls, architecture decisions, and operational documentation.
 
-The initial milestone focuses on the network foundation, security groups, and bastion/private EC2 infrastructure.
+The infrastructure has not been deployed as part of this workflow. Documented controls therefore describe the Terraform configuration and intended design, not independently verified controls on running AWS resources.
 
-## Cost and Cleanup
+## Documentation
 
-AWS resources may incur charges when deployed. Review the expected costs before deployment and ensure resources are safely destroyed when no longer required.
+### Architecture and security
 
-Only run `terraform destroy` after reviewing its plan and confirming that the resources are safe to remove.
+- [Architecture Overview](doc/ARCHITECTURE.md) — network layout, components, and traffic flows.
+- [Security Design](doc/SECURITY.md) — security controls, assumptions, limitations, and deferred work.
 
-## Security Considerations
+### Architecture Decision Records
 
-- Restrict administrator SSH access to an approved CIDR.
-- Never expose the private EC2 instance directly to the public internet.
-- Keep Terraform state and sensitive configuration out of version control.
-- Review security group rules and Terraform plans before deployment.
-- Treat this project as an evolving learning architecture, not a production-ready security baseline until the remaining hardening and operational work is completed.
+- [ADR-0001: VPC CIDR Allocation](doc/adr/0001-network-cidr-allocation.md)
+- [ADR-0002: Bastion-Based SSH Access](doc/adr/0002-bastion-ssh-access.md)
+- [ADR-0003: Private Instance Isolation](doc/adr/0003-private-instance-isolation.md)
+- [ADR Template](doc/adr/0000-template.md)
+
+### Operational runbooks
+
+- [Terraform Deployment](doc/runbooks/terraform-deployment.md)
+- [Terraform Destruction](doc/runbooks/terraform-destruction.md)
+- [Bastion Access Troubleshooting](doc/runbooks/bastion-access-troubleshooting.md)
+
+## Cost and Cleanup Considerations
+
+No AWS resources have been created through this workflow. If the configuration is deployed later, review expected charges before applying it.
+
+Potential costs include EC2 instance usage, EBS storage, public IPv4 addresses, and any additional network services introduced in future iterations.
+
+Do not destroy resources until the Terraform destruction plan has been reviewed and the required approval obtained. See the [Terraform Destruction Runbook](doc/runbooks/terraform-destruction.md).
+
+## License
+
+No license has been specified for this repository yet.
