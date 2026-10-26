@@ -1,2 +1,5 @@
-# Documentation-only example from the expected admin IP range.
-admin_cidr = 198.51.100.25/32
+# Documentation-only example. Replace with approved public IPv4 CIDR.
+admin_cidr = "198.51.100.25/32"
+
+# Documentation-only example. Replace with an existing EC2 key pair name in the selected AWS region.
+key_pair_name = "test-public-host"
