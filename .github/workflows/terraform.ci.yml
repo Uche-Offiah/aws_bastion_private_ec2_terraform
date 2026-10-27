@@ -15,7 +15,7 @@ permissions:
 jobs:
   terraform-checks:
     name: Format and validate
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
