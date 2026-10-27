@@ -76,4 +76,3 @@ The following items require further evaluation before implementation:
 - EC2 monitoring and alerting requirements.
 - Additional Terraform safeguards and input validation.
 - Whether future workloads require controlled outbound connectivity.
-
