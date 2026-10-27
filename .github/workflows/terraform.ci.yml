@@ -8,13 +8,14 @@ on:
   push:
     branches:
       - main
+      - 'feature/**'
 
 permissions:
   contents: read
 
 jobs:
   terraform-checks:
-    name: Format and validate
+    name: Terraform quality and security checks
     runs-on: ubuntu-latest
 
     steps:
