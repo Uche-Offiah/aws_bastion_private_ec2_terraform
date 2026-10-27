@@ -40,8 +40,8 @@ variable "admin_cidr" {
 
   validation {
     condition = (
-      can(cidrhost(var.admin_cidr, 0)) &&                      # parse and get the first host IP
-      can(regex("/([0-9]|[12][0-9]|3[0-2])$", var.admin_cidr)) # check to ensure a valid CIDR /0-32. [12][0-9] matches /10 to /29. $ ensure pattern occur at the end of the string
+      can(cidrnetmask(var.admin_cidr)) &&                      # verifies that the value is a valid IPv4 CIDR. IPv6 CIDRs fail this check
+      can(regex("/([1-9]|[12][0-9]|3[0-2])$", var.admin_cidr)) # check to ensure a valid CIDR /1-32. [12][0-9] matches /10 to /29. Fails for anywhere 0.0.0.0/0
     )
     error_message = "admin_cidr must be valid IPv4 CIDR, such as 198.51.100.25/32."
   }

@@ -5,6 +5,7 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids      = [aws_security_group.bastion.id]
   key_name                    = var.key_pair_name
   associate_public_ip_address = true
+  disable_api_termination     = true
 
   metadata_options {
     http_endpoint = "enabled"
@@ -31,6 +32,7 @@ resource "aws_instance" "private" {
   vpc_security_group_ids      = [aws_security_group.private.id]
   key_name                    = var.key_pair_name
   associate_public_ip_address = false
+  disable_api_termination     = true
 
   metadata_options {
     http_endpoint = "enabled"
