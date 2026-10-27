@@ -11,6 +11,19 @@ resource "aws_vpc" "main" {
 
 }
 
+# VPC default security group.
+resource "aws_default_security_group" "main" {
+  vpc_id = aws_vpc.main.id
+
+  # Remove all default inbound and outbound rules.
+  ingress = []
+  egress  = []
+
+  tags = {
+    Name = "${var.project_name}-default-sg"
+  }
+}
+
 # Internet gateway
 resource "aws_internet_gateway" "main" {
 
