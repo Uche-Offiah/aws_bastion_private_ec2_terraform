@@ -38,7 +38,7 @@ resource "aws_subnet" "public" {
 
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidr
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false # Disabled to prevent automatic public IP assignment; reduces unintended internet exposure and does not incur a direct cost.
 
   tags = {
     "Name" = "${var.project_name}-public-subnet"
