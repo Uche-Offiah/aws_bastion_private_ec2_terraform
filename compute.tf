@@ -1,3 +1,5 @@
+#checkov:skip=CKV_AWS_88:Public IP is intentional for the current direct-SSH bastion architecture; SSH ingress is restricted to the configured administrator CIDR.
+#checkov:skip=CKV2_AWS_41:No EC2 instance role is needed for the current workload because it does not require AWS API permissions; reassess if SSM or other AWS integrations are introduced.
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ssm_parameter.amazon_linux_2023.value
   instance_type               = var.bastion_instance_type
@@ -28,6 +30,7 @@ resource "aws_instance" "bastion" {
   }
 }
 
+#checkov:skip=CKV2_AWS_41:No EC2 instance role is needed for the current workload because it does not require AWS API permissions; reassess if SSM or other AWS integrations are introduced.
 resource "aws_instance" "private" {
   ami                         = data.aws_ssm_parameter.amazon_linux_2023.value
   instance_type               = var.private_instance_type

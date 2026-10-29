@@ -1,5 +1,8 @@
 data "aws_caller_identity" "current" {}
 
+
+#checkov:skip=CKV_AWS_338:30-day retention is the deliberate development default to balance troubleshooting needs and log-storage costs; production audit requirements may require longer retention.
+#checkov:skip=CKV_AWS_158:Customer-managed KMS encryption is deferred to avoid additional key-management complexity and potential cost; CloudWatch Logs default encryption at rest remains enabled.
 resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
   name              = "/aws/vpc/${var.project_name}/flow-logs"
   retention_in_days = var.flow_log_retention_days

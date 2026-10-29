@@ -136,6 +136,7 @@ resource "aws_security_group" "private" {
 }
 
 # Allow SSH to private EC2 only from the bastion security group.
+#checkov:skip=CKV_AWS_24:SSH ingress is restricted to the bastion security group, not an unrestricted CIDR; this is required for private-instance administration.
 resource "aws_vpc_security_group_ingress_rule" "private_ssh" {
   security_group_id = aws_security_group.private.id
 
