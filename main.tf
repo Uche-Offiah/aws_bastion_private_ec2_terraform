@@ -11,6 +11,19 @@ resource "aws_vpc" "main" {
 
 }
 
+# VPC default security group.
+resource "aws_default_security_group" "main" {
+  vpc_id = aws_vpc.main.id
+
+  # Remove all default inbound and outbound rules.
+  ingress = []
+  egress  = []
+
+  tags = {
+    Name = "${var.project_name}-default-sg"
+  }
+}
+
 # Internet gateway
 resource "aws_internet_gateway" "main" {
 
@@ -25,7 +38,7 @@ resource "aws_subnet" "public" {
 
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidr
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false # Disabled to prevent automatic public IP assignment; reduces unintended internet exposure and does not incur a direct cost.
 
   tags = {
     "Name" = "${var.project_name}-public-subnet"
@@ -123,6 +136,7 @@ resource "aws_security_group" "private" {
 }
 
 # Allow SSH to private EC2 only from the bastion security group.
+#checkov:skip=CKV_AWS_24:SSH ingress is restricted to the bastion security group, not an unrestricted CIDR; this is required for private-instance administration.
 resource "aws_vpc_security_group_ingress_rule" "private_ssh" {
   security_group_id = aws_security_group.private.id
 
