@@ -122,8 +122,9 @@ Consequently, general outbound internet access is not provided by the current de
 - SSH through the bastion is the designed administrative access method.
 - AWS Systems Manager Session Manager is not configured.
 - There is no NAT Gateway or VPC endpoint configuration.
-- The design currently includes one public subnet and one private subnet; multi-AZ resilience has not been established.
-- Monitoring, alerting, and operational recovery procedures require further development.
+- The design includes one public subnet and one private subnet; multi-AZ resilience has not been established.
+- VPC Flow Logs and detailed EC2 monitoring are configured in Terraform, but their operation has not been verified against deployed resources.
+- Alerting, incident-response procedures, and operational recovery capabilities are not fully established.
 
 These limitations are intentional POC boundaries, not claims that the architecture is production-ready.
 
