@@ -114,9 +114,11 @@ If deployment is approved, follow the [Terraform Deployment Runbook](doc/runbook
 
 ## Project Status
 
-This project is being developed iteratively. The initial network foundation is documented, and the current hardening iteration includes security controls, architecture decisions, and operational documentation.
+The project is being developed through versioned iterations. Iteration 3 established the current enterprise-IaC baseline, including network segmentation, EC2 hardening, VPC Flow Logs, and security documentation. Iteration 4 focuses on documentation completeness and operational readiness.
 
-The infrastructure has not been deployed as part of this workflow. Documented controls therefore describe the Terraform configuration and intended design, not independently verified controls on running AWS resources.
+The Terraform configuration has not been deployed as part of this workflow. Documented controls describe the configuration and intended design; they must not be interpreted as verification of controls on running AWS resources.
+
+VPC Flow Logs are configured to capture all traffic and send records to CloudWatch Logs with configurable retention. Detailed EC2 monitoring is enabled and may incur additional charges. These controls do not, by themselves, provide a complete alerting, incident-response, or recovery capability.
 
 ## Documentation
 
