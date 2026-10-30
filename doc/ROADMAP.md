@@ -63,7 +63,7 @@ Do not apply infrastructure as part of the release process unless separately req
 
 ## 4. Iteration 4 — Documentation and audit completion
 
-**Branch:** A dedicated Iteration 4 feature branch.
+**Feature branch:** `feature/iteration-4-documentation-audit`
 
 ### Scope
 
@@ -95,7 +95,7 @@ Iteration 4 does not need a standalone version tag unless a separately useful re
 
 ## 5. Iteration 5 — Local-ready verification and release
 
-**Feature branch:** A dedicated Iteration 5 feature branch.
+**Feature branch:** `feature/iteration-5-local-ready-release`
 
 **Target tag:** `v5.0.0`
 
@@ -134,13 +134,15 @@ This release is a stable milestone, not the end of the project.
 
 ## 6. Iteration 6 — Configuration and modular architecture
 
-**Feature branch:** A dedicated Iteration 6 feature branch.
+**Feature branch:** `feature/iteration-6-modular-environment-architecture`
 
 **Target tag:** `v6.0.0`
 
 ### Objective
 
-Evaluate the configuration structure, environment separation, and reuse opportunities without introducing unnecessary abstraction.
+### Objective
+
+Implement the configuration structure, reusable module boundaries, and environment separation required to move the project toward its target enterprise-ready architecture while preserving a practical local workflow.
 
 ### Scope
 
@@ -153,8 +155,8 @@ Evaluate the configuration structure, environment separation, and reuse opportun
 
 ### Acceptance criteria
 
-- [ ] A documented review evaluates the current configuration and module boundaries.
-- [ ] Module extraction is justified by concrete reuse or maintainability benefits.
+- [ ] A documented architecture review defines the target configuration, module boundaries, and environment separation.
+- [ ] The agreed module architecture is implemented and verified; any deferred component has a documented rationale and acceptance decision.
 - [ ] If modules are introduced, their inputs, outputs, responsibilities, and dependencies are documented.
 - [ ] Environment separation is explicit and does not rely on assumptions about the active environment.
 - [ ] Development and future environments cannot accidentally share state unintentionally.
@@ -169,7 +171,7 @@ Evaluate the configuration structure, environment separation, and reuse opportun
 
 ## 7. Iteration 7 — Terraform state strategy and final release
 
-**Feature branch:** A dedicated Iteration 7 feature branch.
+**Feature branch:** `feature/iteration-7-remote-state-final-release`
 
 **Target tag:** `v7.0.0`
 
