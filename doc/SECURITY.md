@@ -73,6 +73,7 @@ Before deploying:
 The following items require further evaluation before implementation:
 
 - SSM management access and its IAM and network requirements.
-- EC2 monitoring and alerting requirements.
+- Alerting and operational response requirements for VPC Flow Logs and EC2 monitoring.
+- Verification of Flow Logs delivery, log access permissions, and retention after deployment.
 - Additional Terraform safeguards and input validation.
 - Whether future workloads require controlled outbound connectivity.

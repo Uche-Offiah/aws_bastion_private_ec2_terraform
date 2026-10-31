@@ -68,10 +68,10 @@ Security-group changes should be narrowly scoped and reviewed before implementat
 
 ### Step 5: Test SSH to the bastion
 
-From the administrator workstation:
+From the administrator workstation, connect through the bastion using SSH agent forwarding:
 
 ```bash
-ssh -i <path-to-private-key> ec2-user@<bastion-public-ip>
+ssh -A -i <path-to-private-key> ec2-user@<bastion-public-ip>
 ```
 
 Replace the placeholders with the actual private-key path and bastion public IP.
@@ -100,17 +100,20 @@ Confirm that:
 - The private security group permits inbound TCP port 22 from the bastion security group.
 - The bastion security group's egress rule permits TCP port 22 to the private security group.
 
-From the bastion, attempt SSH to the private instance:
+Once connected to the bastion, connect to the private instance:
 
 ```bash
-ssh -i <path-to-private-key> ec2-user@<private-instance-ip>
+ssh ec2-user@<private-instance-ip>
 ```
 
-This command assumes the private key is securely available on the bastion. Prefer a securely managed access method or SSH agent forwarding rather than copying private keys onto the bastion. If the key is not available there, use an approved alternative that keeps the private key on the administrator workstation.
+This approach requires an SSH agent on the administrator workstation with the appropriate private key loaded. Agent forwarding allows the second SSH connection to use the workstation's agent without copying the private key onto the bastion.
+
+Use agent forwarding only when the bastion is trusted and its security implications are understood. If agent forwarding is unavailable or prohibited, use an approved alternative that keeps private-key material off the bastion. Never paste or commit a private key into the repository, a ticket, or a chat.
 
 If SSH times out, investigate security-group rules, subnet routing, network ACLs, and SSH availability on the private instance.
-
 If SSH returns `Permission denied (publickey)`, verify the username and key authorization.
+
+**Important:** `ssh -A` enables agent forwarding; it does not load the key into your agent automatically. If needed, load it on your workstation using `ssh-add` before connecting.
 
 ### Step 7: Review the intentional connectivity restrictions
 

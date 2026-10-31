@@ -48,7 +48,23 @@ Initialization downloads the required provider plugins and prepares the working 
 
 If provider dependencies change, review the changes to `.terraform.lock.hcl` before committing.
 
-## 5. Format and Validate
+
+## 5. Terraform State Safety
+
+This project currently uses Terraform's default local backend. Terraform state is stored locally in `terraform.tfstate`, and Terraform may create a backup file when updating state.
+
+Terraform state can contain sensitive infrastructure details and must be protected.
+
+- Never commit Terraform state, state backups, saved plan files, or credentials to Git.
+- Keep state and backup files in an access-controlled location with appropriate disk protection.
+- Do not delete, manually edit, or replace state files as a troubleshooting shortcut.
+- Avoid concurrent Terraform operations against the same local state. The local backend does not provide shared remote state or remote state locking for a team.
+- Before running Terraform from another workstation or changing the backend, establish which state is authoritative and follow a reviewed state-migration procedure.
+- If state is lost, corrupted, or appears inconsistent with AWS, stop and investigate before planning or applying changes.
+
+Remote state is a future roadmap item; until it is implemented and reviewed, treat this project as a single-operator workflow using its existing local state.
+
+## 6. Format and Validate
 
 Run:
 
@@ -59,7 +75,7 @@ terraform validate
 
 Resolve formatting or validation failures before continuing.
 
-## 6. Review the Proposed Changes
+## 7. Review the Proposed Changes
 
 Generate a plan:
 
@@ -86,7 +102,7 @@ If the plan contains unexpected changes, stop and investigate.
 
 The saved plan may contain sensitive information. Do not commit it, upload it to an unapproved location, or share it publicly.
 
-## 7. Approval and Application
+## 8. Approval and Application
 
 Do not apply the plan until the required approval has been obtained.
 
@@ -100,7 +116,7 @@ Applying a saved plan uses the proposed actions in that plan rather than interac
 
 Do not use `-auto-approve` as a substitute for review or approval.
 
-## 8. Post-Deployment Verification
+## 9. Post-Deployment Verification
 
 If deployment is explicitly approved and completed:
 
@@ -113,6 +129,6 @@ Verify the resulting resources in the AWS console or through appropriate AWS CLI
 
 Confirm that the deployed network configuration matches the reviewed plan. Record any discrepancies and investigate them before declaring the deployment successful.
 
-## 9. Cleanup
+## 10. Cleanup
 
 When deployment testing is complete, follow [the Terraform Destruction Runbook](terraform-destruction.md). Do not assume that all resources can be safely removed without reviewing their dependencies and data-retention requirements.
