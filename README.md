@@ -71,50 +71,66 @@ The Terraform configuration uses the AWS provider `~> 6.0` and requires Terrafor
 
 ## Configuration
 
-Review `variable.tf` and `terraform.tfvars.example` to understand the configurable inputs.
+Review `variable.tf` and `terraform.tfvars.example` before configuring the project.
 
-Create a local `terraform.tfvars` file based on the example:
+Create your local variable file from the tracked example:
 
-```hcl
-aws_region     = "us-east-2"
-admin_cidr     = "REPLACE_WITH_APPROVED_PUBLIC_IPV4_CIDR"
-key_pair_name  = "REPLACE_WITH_EXISTING_EC2_KEY_PAIR_NAME"
+```bash
+cp terraform.tfvars.example terraform.tfvars
 ```
 
-The example above illustrates the main deployment-specific values; retain or add any other required variables from `terraform.tfvars.example`.
+Edit `terraform.tfvars` and replace the documentation-only values:
 
-Do not commit `terraform.tfvars`, private keys, Terraform state files, or saved plan files.
+- `admin_cidr`: use an approved public IPv4 CIDR for the administrator who will access the bastion. Do not use the example documentation address.
+- `key_pair_name`: use the name of an existing EC2 key pair in the selected AWS region.
+- `aws_region`: set this explicitly if you intend to use a region other than the configured default.
+
+Review any other required variables in `variable.tf`. The local `terraform.tfvars` file is ignored by Git and must not be committed.
 
 ## Validate and Plan
 
-Run these commands from the repository root:
+Run these commands from the repository root.
+
+First, initialize the local Terraform working directory:
 
 ```bash
 terraform init
-terraform fmt -check -recursive
-terraform validate
-terraform plan -out=tfplan
-terraform show -no-color tfplan
 ```
 
-Review the plan carefully for unexpected resource changes, particularly in a shared AWS account.
+Then check formatting and configuration validity:
 
-Check the AWS identity and intended region before planning:
+```bash
+terraform fmt -check -recursive
+terraform validate
+```
+
+Before planning, verify the AWS identity you intend to use:
 
 ```bash
 aws sts get-caller-identity
 aws configure get region
 ```
 
-The AWS CLI region may differ from the Terraform provider region, so confirm both.
+Confirm the account ID and region. The AWS CLI region may differ from the Terraform provider region, which is controlled by `aws_region`.
 
-**Do not apply a plan without explicit approval.** This repository's current workflow does not require deployment to complete the POC's documentation and review milestones.
+Generate a saved plan for review:
+
+```bash
+terraform plan -out=tfplan
+terraform show -no-color tfplan
+```
+
+Review all proposed additions, changes, and deletions, especially networking, security groups, IAM permissions, EC2 instances, and EBS resources in a shared AWS account. Investigate any unexpected changes before proceeding.
+
+The saved plan may contain sensitive information. Do not commit it or share it through unapproved channels. The repository's `.gitignore` excludes saved plan files.
+
+**Planning does not authorize deployment. Do not run `terraform apply` without explicit approval.** No AWS deployment is required for this local-ready release.
 
 If deployment is approved, follow the [Terraform Deployment Runbook](doc/runbooks/terraform-deployment.md).
 
 ## Project Status
 
-The project is being developed through versioned iterations. Iteration 3 established the current enterprise-IaC baseline, including network segmentation, EC2 hardening, VPC Flow Logs, and security documentation. Iteration 4 focuses on documentation completeness and operational readiness.
+The project is being developed through versioned iterations. Iterations 3 and 4 established the enterprise-IaC baseline and completed the documentation and operational-readiness review. Iteration 5 focuses on local-ready verification and release.
 
 The Terraform configuration has not been deployed as part of this workflow. Documented controls describe the configuration and intended design; they must not be interpreted as verification of controls on running AWS resources.
 
@@ -139,6 +155,7 @@ VPC Flow Logs are configured to capture all traffic and send records to CloudWat
 - [Terraform Deployment](doc/runbooks/terraform-deployment.md)
 - [Terraform Destruction](doc/runbooks/terraform-destruction.md)
 - [Bastion Access Troubleshooting](doc/runbooks/bastion-access-troubleshooting.md)
+- [VPC Flow Logs Troubleshooting](doc/runbooks/vpc-flow-logs-troubleshooting.md)
 
 ## Cost and Cleanup Considerations
 
