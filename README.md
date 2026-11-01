@@ -130,7 +130,7 @@ If deployment is approved, follow the [Terraform Deployment Runbook](doc/runbook
 
 ## Project Status
 
-The project is being developed through versioned iterations. Iteration 3 established the current enterprise-IaC baseline, including network segmentation, EC2 hardening, VPC Flow Logs, and security documentation. Iteration 4 focuses on documentation completeness and operational readiness.
+The project is being developed through versioned iterations. Iterations 3 and 4 established the enterprise-IaC baseline and completed the documentation and operational-readiness review. Iteration 5 focuses on local-ready verification and release.
 
 The Terraform configuration has not been deployed as part of this workflow. Documented controls describe the configuration and intended design; they must not be interpreted as verification of controls on running AWS resources.
 
@@ -155,6 +155,7 @@ VPC Flow Logs are configured to capture all traffic and send records to CloudWat
 - [Terraform Deployment](doc/runbooks/terraform-deployment.md)
 - [Terraform Destruction](doc/runbooks/terraform-destruction.md)
 - [Bastion Access Troubleshooting](doc/runbooks/bastion-access-troubleshooting.md)
+- [VPC Flow Logs Troubleshooting](doc/runbooks/vpc-flow-logs-troubleshooting.md)
 
 ## Cost and Cleanup Considerations
 
