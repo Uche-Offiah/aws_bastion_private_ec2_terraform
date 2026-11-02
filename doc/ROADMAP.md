@@ -140,18 +140,20 @@ This release is a stable milestone, not the end of the project.
 
 ### Objective
 
-### Objective
-
 Implement the configuration structure, reusable module boundaries, and environment separation required to move the project toward its target enterprise-ready architecture while preserving a practical local workflow.
 
 ### Scope
 
-- Assess whether reusable Terraform modules are justified by the current architecture.
-- Review root-module responsibilities and input/output boundaries.
-- Evaluate how development and future environments should be separated.
-- Consider state isolation and environment-specific configuration.
-- Preserve local execution compatibility.
-- Update architecture documentation and ADRs to reflect accepted decisions.
+- Implement the modular Terraform architecture defined in ADR-0004.
+- Separate networking, security, compute, and Flow Logs responsibilities into reusable modules.
+- Establish the development environment root configuration.
+- Define explicit module inputs, outputs, and dependencies.
+- Implement independent local Terraform state for each environment.
+- Preserve the existing local execution workflow.
+- Update CI workflows to validate the environment root and reusable modules.
+- Update architecture documentation and ADR implementation references.
+- Preserve existing infrastructure and security decisions.
+- Defer S3 remote state implementation to Iteration 7.
 
 ### Acceptance criteria
 

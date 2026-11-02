@@ -128,9 +128,41 @@ Consequently, general outbound internet access is not provided by the current de
 
 These limitations are intentional POC boundaries, not claims that the architecture is production-ready.
 
-## 8. Related Documentation
+## 8. Terraform Configuration Architecture
+
+The Terraform configuration uses separate environment root configurations and reusable infrastructure modules.
+
+The initial environment is `development`, located at:
+
+`environments/development/`
+
+The development environment root is responsible for:
+- AWS provider configuration and region selection.
+- Environment-specific input variables and configuration values.
+- Composing the reusable infrastructure modules.
+- Centrally applying provider-level default tags.
+- Exposing relevant infrastructure outputs.
+
+Infrastructure responsibilities are separated into the following modules:
+
+| Module | Responsibility |
+|---|---|
+| `modules/networking/` | VPC, subnets, Internet Gateway, route tables, and routing |
+| `modules/security/` | Bastion and private EC2 security groups and access rules |
+| `modules/compute/` | Amazon Linux 2023 lookup and EC2 instances |
+| `modules/flow-logs/` | CloudWatch log group, IAM permissions, and VPC Flow Logs |
+
+Each environment maintains an independent Terraform state. During Iteration 6, state is stored locally in the relevant environment root directory.
+
+Remote state management using Amazon S3 is deferred to Iteration 7.
+
+The modular configuration preserves the network architecture and security decisions documented in this document and the associated architecture decision records.
+
+## 9. Related Documentation
 
 - [Security Design](SECURITY.md)
 - [ADR-0001: VPC CIDR Allocation](adr/0001-network-cidr-allocation.md)
 - [ADR-0002: Bastion-Based SSH Access](adr/0002-bastion-ssh-access.md)
 - [ADR-0003: Private Instance Isolation](adr/0003-private-instance-isolation.md)
+- [ADR-0004: Modular Architecture and Environment Isolation](adr/0004-modular-architecture-and-environment-isolation.md)
+- [Project Roadmap](ROADMAP.md)
