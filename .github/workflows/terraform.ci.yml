@@ -30,11 +30,11 @@ jobs:
       - name: Check formatting
         run: terraform fmt -check -recursive
 
-      - name: Initialize without backend
-        run: terraform init -backend=false
+      - name: Initialize development environment without backend
+        run: terraform -chdir=environments/development init -backend=false -lockfile=readonly
 
-      - name: Validate configuration
-        run: terraform validate
+      - name: Validate development environment
+        run: terraform -chdir=environments/development validate
 
       - name: Scan Terraform with Checkov
         uses: bridgecrewio/checkov-action@v12
