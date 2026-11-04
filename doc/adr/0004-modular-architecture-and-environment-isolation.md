@@ -100,8 +100,6 @@ Additional environments will follow the same structure when their requirements a
 
 ### 2.3 Terraform state isolation
 
-### 2.3 Terraform state isolation
-
 Each environment will maintain its own independent Terraform state, stored locally in its environment root directory during Iteration 6.
 
 Terraform operations must be executed from the relevant environment directory. Each environment must be initialized and managed independently, with no shared state file between environments.
