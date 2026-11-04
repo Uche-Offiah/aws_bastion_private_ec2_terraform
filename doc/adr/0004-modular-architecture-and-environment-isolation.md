@@ -1,6 +1,6 @@
 # ADR-0004: Modular Architecture and Environment Isolation
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-02
 - **Decision Owners:** Project maintainers
 - **Related Iteration:** Iteration 6 – Modular Environment Architecture
