@@ -77,3 +77,20 @@ The following items require further evaluation before implementation:
 - Verification of Flow Logs delivery, log access permissions, and retention after deployment.
 - Additional Terraform safeguards and input validation.
 - Whether future workloads require controlled outbound connectivity.
+
+## 8. Terraform Security Configuration Organization
+
+Security-related Terraform resources are maintained in the following modules:
+
+- `modules/security/` — Security groups and explicit ingress and egress rules.
+- `modules/compute/` — EC2 instance hardening, including IMDSv2, encrypted root volumes, and termination protection.
+- `modules/networking/` — VPC boundaries, subnet isolation, and route table configuration.
+- `modules/flow-logs/` — VPC Flow Logs, CloudWatch logging, and the associated IAM permissions.
+
+The development environment composes these modules through `environments/development/`.
+
+Environment-specific configuration, including the administrator CIDR and EC2 key pair, remains separate from reusable module implementation.
+
+Each environment maintains independent Terraform state. The Iteration 6 implementation uses local state; remote state is deferred to Iteration 7.
+
+Modularization must not introduce broader network access, unrestricted security-group rules, or changes to the security decisions documented above.

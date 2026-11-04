@@ -1,5 +1,5 @@
 variable "aws_region" {
-  description = "AWS region where the infrastructure will be deployed"
+  description = "AWS region where the infrastructure will be deployed."
   type        = string
   default     = "us-east-2"
 }
@@ -17,38 +17,38 @@ variable "environment" {
 }
 
 variable "vpc_cidr" {
-  description = "CIDR range for the aws-bastion-private-ec2 project"
+  description = "CIDR range for the aws-bastion-private-ec2 project."
   type        = string
   default     = "10.20.0.0/16"
 }
 
 variable "public_subnet_cidr" {
-  description = "CIDR range for the public bastion subnet"
+  description = "CIDR range for the public bastion subnet."
   type        = string
   default     = "10.20.1.0/24"
 }
 
 variable "private_subnet_cidr" {
-  description = "CIDR range for the private ec2 subnet"
+  description = "CIDR range for the private EC2 subnet."
   type        = string
   default     = "10.20.2.0/24"
 }
 
 variable "admin_cidr" {
-  description = "Approved public IPv4 CIDR allowed to connect bastion over SSH"
+  description = "Approved public IPv4 CIDR allowed to connect to the bastion over SSH."
   type        = string
 
   validation {
     condition = (
-      can(cidrnetmask(var.admin_cidr)) &&                      # verifies that the value is a valid IPv4 CIDR. IPv6 CIDRs fail this check
-      can(regex("/([1-9]|[12][0-9]|3[0-2])$", var.admin_cidr)) # check to ensure a valid CIDR /1-32. [12][0-9] matches /10 to /29. Fails for anywhere 0.0.0.0/0
+      can(cidrnetmask(var.admin_cidr)) &&
+      can(regex("/([1-9]|[12][0-9]|3[0-2])$", var.admin_cidr))
     )
     error_message = "admin_cidr must be valid IPv4 CIDR, such as 198.51.100.25/32."
   }
 }
 
 variable "bastion_instance_type" {
-  description = "EC2 instance type for the bastion host"
+  description = "EC2 instance type for the bastion host."
   type        = string
   default     = "t3.micro"
 }

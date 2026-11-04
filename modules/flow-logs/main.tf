@@ -1,6 +1,4 @@
-data "aws_caller_identity" "current" {}
-
-
+# VPC Flow Logs CloudWatch log group.
 #checkov:skip=CKV_AWS_338:30-day retention is the deliberate development default to balance troubleshooting needs and log-storage costs; production audit requirements may require longer retention.
 #checkov:skip=CKV_AWS_158:Customer-managed KMS encryption is deferred to avoid additional key-management complexity and potential cost; CloudWatch Logs default encryption at rest remains enabled.
 resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
@@ -12,6 +10,7 @@ resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
   }
 }
 
+# IAM role assumed by the VPC Flow Logs service.
 resource "aws_iam_role" "vpc_flow_logs" {
   name = "${var.project_name}-vpc-flow-logs-role"
 
@@ -42,6 +41,7 @@ resource "aws_iam_role" "vpc_flow_logs" {
   }
 }
 
+# IAM permissions required by VPC Flow Logs to publish log data.
 resource "aws_iam_role_policy" "vpc_flow_logs" {
   name = "${var.project_name}-vpc-flow-logs-policy"
   role = aws_iam_role.vpc_flow_logs.name
@@ -75,11 +75,12 @@ resource "aws_iam_role_policy" "vpc_flow_logs" {
   })
 }
 
+# Capture all VPC traffic and publish it to CloudWatch Logs.
 resource "aws_flow_log" "main" {
   log_destination      = aws_cloudwatch_log_group.vpc_flow_logs.arn
   log_destination_type = "cloud-watch-logs"
   traffic_type         = "ALL"
-  vpc_id               = aws_vpc.main.id
+  vpc_id               = var.vpc_id
   iam_role_arn         = aws_iam_role.vpc_flow_logs.arn
 
   depends_on = [aws_iam_role_policy.vpc_flow_logs]
