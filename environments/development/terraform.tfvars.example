@@ -1,0 +1,5 @@
+# Documentation-only placeholders.
+# Replace both values with approved values before any deployment.
+
+admin_cidr   = "198.51.100.25/32"
+key_pair_name = "centennial-test-public-host"
