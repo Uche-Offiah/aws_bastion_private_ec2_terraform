@@ -185,10 +185,13 @@ Implement a secure and recoverable remote-state workflow for shared use while re
 
 - Finalize the Terraform state strategy ADR.
 - Design and implement the S3 backend workflow.
-- Establish a separate bootstrap process for backend infrastructure.
-- Configure and document state locking, encryption, access control, and recovery.
-- Define safe state migration and operational procedures.
-- Revalidate the local workflow.
+- Establish a dedicated `bootstrap/terraform-state/` Terraform root using local state to provision the S3 backend bucket.
+- Keep bootstrap state local and securely backed up; do not store it in the bucket it provisions.
+- Configure S3 versioning, SSE-S3 encryption, public-access blocking, and HTTPS-only bucket access.
+- Configure Terraform's native S3 lockfile mechanism using `use_lockfile = true`.
+- Configure independent S3 state keys for each environment.
+- Preserve backend-disabled local initialization and validation.
+- Configure and document state locking, least-privilege access control, migration, and recovery.
 - Complete final project documentation and release verification.
 
 ### Acceptance criteria
@@ -203,6 +206,11 @@ Implement a secure and recoverable remote-state workflow for shared use while re
 - [ ] Terraform's supported native S3 lockfile mechanism is evaluated and configured if the S3 backend is selected.
 - [ ] State and saved plan files remain excluded from version control.
 - [ ] No secrets or sensitive state contents are added to source control or logs.
+- [ ] The bootstrap configuration uses local state and is independent of the environment configurations that consume the S3 backend.
+- [ ] The bootstrap state is excluded from version control and has documented secure backup procedures.
+- [ ] The S3 backend uses SSE-S3 encryption, bucket versioning, public-access blocking, and HTTPS-only access.
+- [ ] The development environment uses a separate S3 state key and Terraform's native S3 lockfile.
+- [ ] The actual backend configuration is excluded from version control; a non-sensitive example is provided.
 
 #### Bootstrap and migration
 
@@ -221,6 +229,9 @@ Implement a secure and recoverable remote-state workflow for shared use while re
 - [ ] Formatting, initialization, validation, CI, security scanning, and documentation checks pass.
 - [ ] The final Terraform plan is reviewed and contains no unexpected changes.
 - [ ] No infrastructure deployment is performed without separate explicit approval.
+- [ ] The bootstrap root can be initialized and validated locally without a remote backend.
+- [ ] The development root can be initialized and validated locally using `terraform init -backend=false`.
+- [ ] CI initializes and validates both the bootstrap and development roots without requiring AWS credentials or a remote state bucket.
 
 #### Final release
 
