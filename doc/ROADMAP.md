@@ -1,7 +1,7 @@
 # Terraform Bastion and Private EC2 — Iteration Roadmap
 
 - **Status:** Proposed roadmap
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-07
 - **Repository:** `urch/aws_bastion_private_ec2_terraform`
 - **Primary branch:** `main`
 - **AWS region:** `us-east-2`
@@ -198,39 +198,39 @@ Implement a secure and recoverable remote-state workflow for shared use while re
 
 #### State architecture
 
-- [ ] The ADR distinguishes local state from remote state and explains the trade-offs.
-- [ ] The selected backend and its operational prerequisites are documented.
-- [ ] The backend bootstrap process is separate from the infrastructure that consumes the backend.
-- [ ] The state design addresses concurrency, encryption, least-privilege access, and recovery.
-- [ ] The S3 design includes versioning, public-access blocking, and appropriate transport security.
-- [ ] Terraform's supported native S3 lockfile mechanism is evaluated and configured if the S3 backend is selected.
+- [x] The ADR distinguishes local state from remote state and explains the trade-offs.
+- [x] The selected backend and its operational prerequisites are documented.
+- [x] The backend bootstrap process is separate from the infrastructure that consumes the backend.
+- [x] The state design addresses concurrency, encryption, least-privilege access, and recovery.
+- [x] The S3 design includes versioning, public-access blocking, and appropriate transport security.
+- [x] Terraform's supported native S3 lockfile mechanism is evaluated and configured if the S3 backend is selected.
 - [ ] State and saved plan files remain excluded from version control.
 - [ ] No secrets or sensitive state contents are added to source control or logs.
-- [ ] The bootstrap configuration uses local state and is independent of the environment configurations that consume the S3 backend.
-- [ ] The bootstrap state is excluded from version control and has documented secure backup procedures.
-- [ ] The S3 backend uses SSE-S3 encryption, bucket versioning, public-access blocking, and HTTPS-only access.
-- [ ] The development environment uses a separate S3 state key and Terraform's native S3 lockfile.
-- [ ] The actual backend configuration is excluded from version control; a non-sensitive example is provided.
+- [x] The bootstrap configuration uses local state and is independent of the environment configurations that consume the S3 backend.
+- [x] The bootstrap state is excluded from version control and has documented secure backup procedures.
+- [x] The S3 backend uses SSE-S3 encryption, bucket versioning, public-access blocking, and HTTPS-only access.
+- [x] The development environment uses a separate S3 state key and Terraform's native S3 lockfile.
+- [x] The actual backend configuration is excluded from version control; a non-sensitive example is provided.
 
 #### Bootstrap and migration
 
 - [ ] Backend provisioning instructions are reproducible and reviewed.
 - [ ] The procedure verifies that the intended bucket and key are used.
-- [ ] State migration, if required, includes a verified backup and a reviewed migration procedure.
-- [ ] Recovery instructions explain how to restore a prior state version safely.
-- [ ] The procedure requires a subsequent plan review after restoration or migration.
-- [ ] No existing state is deleted or overwritten without explicit approval.
+- [x] State migration, if required, includes a verified backup and a reviewed migration procedure.
+- [x] Recovery instructions explain how to restore a prior state version safely.
+- [x] The procedure requires a subsequent plan review after restoration or migration.
+- [x] No existing state is deleted or overwritten without explicit approval.
 
 #### Compatibility and testing
 
 - [ ] The remote-state workflow is verified using the documented bootstrap prerequisites.
-- [ ] The local workflow remains available and is tested independently.
-- [ ] Backend-specific configuration does not force local users to provision remote infrastructure.
+- [x] The local workflow remains available and is tested independently.
+- [x] Backend-specific configuration does not force local users to provision remote infrastructure.
 - [ ] Formatting, initialization, validation, CI, security scanning, and documentation checks pass.
 - [ ] The final Terraform plan is reviewed and contains no unexpected changes.
 - [ ] No infrastructure deployment is performed without separate explicit approval.
-- [ ] The bootstrap root can be initialized and validated locally without a remote backend.
-- [ ] The development root can be initialized and validated locally using `terraform init -backend=false`.
+- [x] The bootstrap root can be initialized and validated locally without a remote backend.
+- [x] The development root can be initialized and validated locally using `terraform init -backend=false`.
 - [ ] CI initializes and validates both the bootstrap and development roots without requiring AWS credentials or a remote state bucket.
 
 #### Final release

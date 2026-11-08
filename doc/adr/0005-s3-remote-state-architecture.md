@@ -1,6 +1,6 @@
 # ADR-0005: S3 Remote State and Separate Bootstrap Architecture
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-04
 
 ## Context
@@ -183,14 +183,14 @@ The decision affects:
 - `bootstrap/terraform-state/` — standalone backend bootstrap root.
 - `environments/development/` — S3 backend declaration and partial backend configuration.
 - `.gitignore` — exclusion of local backend configuration and sensitive local artifacts.
-- `.github/workflows/terraform.ci.yml` — backend-disabled initialization and validation of bootstrap and development roots.
 - `README.md` — local and remote initialization workflows.
+- `.github/workflows/terraform.ci.yml` — CI validation of both bootstrap and development roots is planned but remains pending; the currently confirmed workflow validates the development root.
 - `doc/ARCHITECTURE.md` — state and bootstrap architecture.
 - `doc/SECURITY.md` — state security, permissions, and recovery controls.
 - `doc/runbooks/` — bootstrap, migration, and recovery procedures.
 - `doc/ROADMAP.md` — Iteration 7 scope and acceptance criteria.
 
-The implementation must be formatted, validated, reviewed, and tested without applying infrastructure unless separately authorized.
+The Terraform configuration and documentation have been implemented and locally validated where noted. CI coverage for both roots, live bucket provisioning, remote backend initialization, state migration, and live locking and recovery verification remain pending. The implementation must be formatted, validated, reviewed, and tested without applying infrastructure unless separately authorized.
 
 ## References
 

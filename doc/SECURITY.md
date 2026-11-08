@@ -78,7 +78,22 @@ The following items require further evaluation before implementation:
 - Additional Terraform safeguards and input validation.
 - Whether future workloads require controlled outbound connectivity.
 
-## 8. Terraform Security Configuration Organization
+## 8. Terraform State Security
+
+Terraform state can contain sensitive infrastructure information and must be treated as sensitive data. The following controls and operational requirements apply to the state architecture:
+
+- The bootstrap root uses local state and does not store its own state in the S3 bucket it provisions.
+- Bootstrap state files and backups must be kept in an access-controlled, protected location and must not be committed to version control.
+- The intended S3 bucket configuration enables versioning, SSE-S3 encryption, all S3 Block Public Access settings, `BucketOwnerEnforced` ownership controls, and a bucket policy that denies non-TLS requests. These are configuration intentions until the bucket is provisioned and verified in AWS.
+- The development backend uses a separate state key and native S3 lockfile-based locking through `use_lockfile = true`.
+- The actual backend configuration file is excluded from version control. Credentials must be supplied through the approved AWS credential chain, not embedded in backend configuration.
+- Access to state objects and lockfiles must follow least-privilege principles. Required IAM permissions must be reviewed for the intended operators and automation; this project has not created or modified shared-account IAM policies.
+- S3 versioning supports recovery of prior object versions but does not replace secure backups, access controls, or a reviewed recovery procedure.
+- State migration and restoration require a verified backup, confirmation of the intended account, bucket, region, and key, and explicit approval.
+
+The S3 bucket has not yet been provisioned. Encryption, versioning, public-access blocking, transport enforcement, and remote locking have not been verified against live AWS resources.
+
+## 9. Terraform Security Configuration Organization
 
 Security-related Terraform resources are maintained in the following modules:
 
@@ -91,6 +106,6 @@ The development environment composes these modules through `environments/develop
 
 Environment-specific configuration, including the administrator CIDR and EC2 key pair, remains separate from reusable module implementation.
 
-Each environment maintains independent Terraform state. The Iteration 6 implementation uses local state; remote state is deferred to Iteration 7.
+Each environment maintains independent Terraform state. The bootstrap root uses local state, while the development root declares an S3 backend with its own state key. The S3 bucket has not yet been provisioned, and the development state has not been migrated. Local validation uses backend-disabled initialization so that it does not require the remote bucket.
 
 Modularization must not introduce broader network access, unrestricted security-group rules, or changes to the security decisions documented above.

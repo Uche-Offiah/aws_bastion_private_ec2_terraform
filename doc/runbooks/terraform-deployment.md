@@ -40,29 +40,56 @@ Also inspect the Terraform provider configuration and variable values. Do not as
 
 ## 4. Initialize Terraform
 
+This repository has two Terraform roots with different backend responsibilities. Do not assume that both roots use the same backend.
+
+### Bootstrap root
+
+The bootstrap root at `bootstrap/terraform-state/` uses local state. From the repository root, local initialization and validation can be performed without provisioning AWS resources:
+
 ```bash
-terraform init
+terraform -chdir=bootstrap/terraform-state init -backend=false -lockfile=readonly
+terraform -chdir=bootstrap/terraform-state validate
 ```
 
-Initialization downloads the required provider plugins and prepares the working directory.
+The bootstrap state is operationally important. Keep its state file and backups secure and separate from the S3 bucket it is intended to create.
 
-If provider dependencies change, review the changes to `.terraform.lock.hcl` before committing.
+### Development root: local validation
 
+The development root declares an S3 backend. To validate its configuration without contacting or requiring the remote bucket, use backend-disabled initialization:
+
+```bash
+terraform -chdir=environments/development init -backend=false -lockfile=readonly
+terraform -chdir=environments/development validate
+```
+
+This verifies local Terraform configuration and provider initialization; it does not verify S3 access, remote state, or locking.
+
+### Development root: remote initialization
+
+Remote initialization is not yet an approved or completed operation. Do not run it until the S3 bucket has been provisioned and verified, the actual local `environments/development/backend.hcl` has been populated with the approved bucket details, the AWS identity and permissions have been checked, and explicit approval has been obtained.
+
+The intended command, for a separately approved migration or initialization procedure, is:
+
+```bash
+terraform -chdir=environments/development init -backend-config=backend.hcl
+```
+
+If an existing local state must be migrated, the operator must follow [the Terraform State Migration Runbook](terraform-state-migration.md). Do not add `-migrate-state` or `-reconfigure` as an exploratory step.
 
 ## 5. Terraform State Safety
 
-This project currently uses Terraform's default local backend. Terraform state is stored locally in `terraform.tfstate`, and Terraform may create a backup file when updating state.
+Terraform state can contain sensitive infrastructure details and must be protected. This project has separate state responsibilities:
 
-Terraform state can contain sensitive infrastructure details and must be protected.
-
-- Never commit Terraform state, state backups, saved plan files, or credentials to Git.
-- Keep state and backup files in an access-controlled location with appropriate disk protection.
+- The bootstrap root uses local state. Keep its state and verified backups in a secure, access-controlled location. It must not depend on the S3 bucket that it provisions.
+- The development root declares an S3 backend with the state key `environments/development/terraform.tfstate` and native S3 lockfile-based locking. The bucket has not yet been provisioned, and development state migration has not been performed.
+- The actual `backend.hcl` file is local configuration and must not be committed. The tracked `.example` file is a template, not a working account-specific configuration.
+- Never commit Terraform state, state backups, saved plan files, credentials, or sensitive variable files.
 - Do not delete, manually edit, or replace state files as a troubleshooting shortcut.
-- Avoid concurrent Terraform operations against the same local state. The local backend does not provide shared remote state or remote state locking for a team.
-- Before running Terraform from another workstation or changing the backend, establish which state is authoritative and follow a reviewed state-migration procedure.
-- If state is lost, corrupted, or appears inconsistent with AWS, stop and investigate before planning or applying changes.
+- Do not run concurrent operations against the same state outside Terraform's locking controls.
+- Before any migration or recovery, confirm the authoritative state, AWS account, bucket, region, and key; create and verify a secure backup; and obtain explicit approval.
+- If state is lost, corrupted, or appears inconsistent with AWS, stop and follow [the Terraform State Recovery Runbook](terraform-state-recovery.md).
 
-Remote state is a future roadmap item; until it is implemented and reviewed, treat this project as a single-operator workflow using its existing local state.
+Backend-disabled initialization is for local validation only. It does not prove that the remote backend is available or correctly configured.
 
 ## 6. Format and Validate
 
@@ -77,7 +104,9 @@ Resolve formatting or validation failures before continuing.
 
 ## 7. Review the Proposed Changes
 
-Generate a plan:
+Generate a plan only after initializing the intended backend and confirming that the correct state is loaded. For the development root, remote planning requires the separately approved S3 backend initialization described in Section 4. Backend-disabled validation alone is not sufficient.
+
+From the relevant root directory, generate a plan:
 
 ```bash
 terraform plan -out=tfplan
