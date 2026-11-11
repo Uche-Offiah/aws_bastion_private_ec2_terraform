@@ -30,6 +30,12 @@ jobs:
       - name: Check formatting
         run: terraform fmt -check -recursive
 
+      - name: Initialize bootstrap without backend
+        run: terraform -chdir=bootstrap/terraform-state init -backend=false -lockfile=readonly
+
+      - name: Validate bootstrap
+        run: terraform -chdir=bootstrap/terraform-state validate
+
       - name: Initialize development environment without backend
         run: terraform -chdir=environments/development init -backend=false -lockfile=readonly
 

@@ -152,9 +152,13 @@ Infrastructure responsibilities are separated into the following modules:
 | `modules/compute/` | Amazon Linux 2023 lookup and EC2 instances |
 | `modules/flow-logs/` | CloudWatch log group, IAM permissions, and VPC Flow Logs |
 
-Each environment maintains an independent Terraform state. During Iteration 6, state is stored locally in the relevant environment root directory.
+Each environment maintains an independent Terraform state. The state architecture separates the bootstrap root from the environment roots that consume the remote backend.
 
-Remote state management using Amazon S3 is deferred to Iteration 7.
+The `bootstrap/terraform-state/` root uses Terraform's default local backend. It is responsible for provisioning the S3 bucket intended to hold environment state. Its own state must remain outside that bucket and must be protected and backed up securely.
+
+The `environments/development/` root declares an S3 backend with a separate state key: `environments/development/terraform.tfstate`. The backend uses native S3 lockfile-based locking through `use_lockfile = true`. The actual `backend.hcl` configuration is local and excluded from version control; `backend.hcl.example` provides a non-sensitive template.
+
+The development backend declaration and bootstrap configuration have been implemented and locally validated. The S3 bucket has not been provisioned, and the development state has not been migrated. Backend initialization against S3, migration, locking, and recovery have therefore not been verified against live AWS resources. Local validation remains available through `terraform init -backend=false`.
 
 The modular configuration preserves the network architecture and security decisions documented in this document and the associated architecture decision records.
 

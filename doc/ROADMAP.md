@@ -1,7 +1,7 @@
 # Terraform Bastion and Private EC2 — Iteration Roadmap
 
 - **Status:** Proposed roadmap
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-07
 - **Repository:** `urch/aws_bastion_private_ec2_terraform`
 - **Primary branch:** `main`
 - **AWS region:** `us-east-2`
@@ -185,51 +185,62 @@ Implement a secure and recoverable remote-state workflow for shared use while re
 
 - Finalize the Terraform state strategy ADR.
 - Design and implement the S3 backend workflow.
-- Establish a separate bootstrap process for backend infrastructure.
-- Configure and document state locking, encryption, access control, and recovery.
-- Define safe state migration and operational procedures.
-- Revalidate the local workflow.
+- Establish a dedicated `bootstrap/terraform-state/` Terraform root using local state to provision the S3 backend bucket.
+- Keep bootstrap state local and securely backed up; do not store it in the bucket it provisions.
+- Configure S3 versioning, SSE-S3 encryption, public-access blocking, and HTTPS-only bucket access.
+- Configure Terraform's native S3 lockfile mechanism using `use_lockfile = true`.
+- Configure independent S3 state keys for each environment.
+- Preserve backend-disabled local initialization and validation.
+- Configure and document state locking, least-privilege access control, migration, and recovery.
 - Complete final project documentation and release verification.
 
 ### Acceptance criteria
 
 #### State architecture
 
-- [ ] The ADR distinguishes local state from remote state and explains the trade-offs.
-- [ ] The selected backend and its operational prerequisites are documented.
-- [ ] The backend bootstrap process is separate from the infrastructure that consumes the backend.
-- [ ] The state design addresses concurrency, encryption, least-privilege access, and recovery.
-- [ ] The S3 design includes versioning, public-access blocking, and appropriate transport security.
-- [ ] Terraform's supported native S3 lockfile mechanism is evaluated and configured if the S3 backend is selected.
-- [ ] State and saved plan files remain excluded from version control.
-- [ ] No secrets or sensitive state contents are added to source control or logs.
+- [x] The ADR distinguishes local state from remote state and explains the trade-offs.
+- [x] The selected backend and its operational prerequisites are documented.
+- [x] The backend bootstrap process is separate from the infrastructure that consumes the backend.
+- [x] The state design addresses concurrency, encryption, least-privilege access, and recovery.
+- [x] The S3 design includes versioning, public-access blocking, and appropriate transport security.
+- [x] Terraform's supported native S3 lockfile mechanism is evaluated and configured if the S3 backend is selected.
+- [x] State and saved plan files remain excluded from version control.
+- [x] No secrets or sensitive state contents are added to source control or logs.
+- [x] The bootstrap configuration uses local state and is independent of the environment configurations that consume the S3 backend.
+- [x] The bootstrap state is excluded from version control and has documented secure backup procedures.
+- [x] The S3 backend uses SSE-S3 encryption, bucket versioning, public-access blocking, and HTTPS-only access.
+- [x] The development environment uses a separate S3 state key and Terraform's native S3 lockfile.
+- [x] The actual backend configuration is excluded from version control; a non-sensitive example is provided.
 
 #### Bootstrap and migration
 
-- [ ] Backend provisioning instructions are reproducible and reviewed.
-- [ ] The procedure verifies that the intended bucket and key are used.
-- [ ] State migration, if required, includes a verified backup and a reviewed migration procedure.
-- [ ] Recovery instructions explain how to restore a prior state version safely.
-- [ ] The procedure requires a subsequent plan review after restoration or migration.
-- [ ] No existing state is deleted or overwritten without explicit approval.
+- [x] Backend provisioning instructions are reproducible and reviewed.
+- [x] The procedure verifies that the intended bucket and key are used.
+- [x] State migration, if required, includes a verified backup and a reviewed migration procedure.
+- [x] Recovery instructions explain how to restore a prior state version safely.
+- [x] The procedure requires a subsequent plan review after restoration or migration.
+- [x] No existing state is deleted or overwritten without explicit approval.
 
 #### Compatibility and testing
 
-- [ ] The remote-state workflow is verified using the documented bootstrap prerequisites.
-- [ ] The local workflow remains available and is tested independently.
-- [ ] Backend-specific configuration does not force local users to provision remote infrastructure.
-- [ ] Formatting, initialization, validation, CI, security scanning, and documentation checks pass.
-- [ ] The final Terraform plan is reviewed and contains no unexpected changes.
-- [ ] No infrastructure deployment is performed without separate explicit approval.
+- [x] The remote-state workflow is verified using the documented bootstrap prerequisites.
+- [x] The local workflow remains available and is tested independently.
+- [x] Backend-specific configuration does not force local users to provision remote infrastructure.
+- [x] Formatting, initialization, validation, CI, security scanning, and documentation checks pass.
+- [x] The final Terraform plan is reviewed and contains no unexpected changes.
+- [x] No infrastructure deployment is performed without separate explicit approval.
+- [x] The bootstrap root can be initialized and validated locally without a remote backend.
+- [x] The development root can be initialized and validated locally using `terraform init -backend=false`.
+- [x] CI initializes and validates both the bootstrap and development roots without requiring AWS credentials or a remote state bucket.
 
 #### Final release
 
-- [ ] All Iteration 7 changes are reviewed and committed.
+- [x] All Iteration 7 changes are reviewed and committed.
 - [ ] All required acceptance criteria are satisfied.
 - [ ] Changes are merged into `main`.
 - [ ] Tag `v7.0.0` points to the accepted final release commit.
 - [ ] Release notes describe supported workflows, backend prerequisites, migration considerations, and known limitations.
-- [ ] Documentation identifies `v7.0.0` as the final planned project milestone.
+- [x] Documentation identifies `v7.0.0` as the final planned project milestone.
 
 ## 8. Branch and commit policy
 

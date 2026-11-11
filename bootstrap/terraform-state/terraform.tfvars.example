@@ -1,0 +1,11 @@
+# AWS region for the Terraform remote state bucket.
+aws_region = "us-east-2"
+
+# Replace with a globally unique S3 bucket name before provisioning.
+state_bucket_name = "replace-with-your-unique-state-bucket-name"
+
+# Optional additional resource tags.
+common_tags = {
+  Purpose    = "Terraform Remote State"
+  CostCenter = "Infrastructure"
+}

@@ -1,0 +1,15 @@
+# S3 bucket created by the separate Terraform state bootstrap root.
+# Replace the placeholder before configuring the remote backend.
+bucket = "replace-with-your-unique-state-bucket-name"
+
+# Independent state key for the development environment.
+key = "environments/development/terraform.tfstate"
+
+# AWS region containing the state bucket.
+region = "us-east-2"
+
+# Enable server-side encryption for the state object.
+encrypt = true
+
+# Use native S3 lockfile-based state locking.
+use_lockfile = true
